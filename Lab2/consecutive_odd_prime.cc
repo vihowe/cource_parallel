@@ -1,3 +1,6 @@
+/**
+ * author: vihowe
+ */
 #include <mpi.h>
 #include <iostream>
 #include <string>
