@@ -1,4 +1,7 @@
 # !/bin/sh
+rm pri_log
+rm pri_time_log
+rm appro_pi_log appro_time_log
 
 for proc_num in `seq 1 8`;
 do
