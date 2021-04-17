@@ -45,10 +45,15 @@ void read_row_striped_matrix (
         MPI_Abort(MPI_COMM_WORLD, 4);
     }
     MPI_Bcast(n, 1, MPI_INT, world_size-1, MPI_COMM_WORLD);
+    // std::cout << "m = " << *m << "  n = " << *n << std::endl;
 
     /* Dynamically allocate matrix */
     int local_rows = BLOCK_SIZE(world_rank, world_size, *m);
+    // std::cout << "rank: " << world_rank << "  local_rows: " << local_rows << std::endl;
+    if((world_rank == 0 || world_rank == world_size - 1) && world_size > 1) local_rows += 1;
+    else if(world_size > 1) local_rows += 2;
 
+    std::cout << "After overlapping, rank: " << world_rank << "  local_rows: " << local_rows << std::endl;
     *storage = (void *)malloc(local_rows * *n * datum_size);    // different processes will have different storage
     *subs = (void **)malloc(local_rows * PTR_SIZE);
 
@@ -61,6 +66,7 @@ void read_row_striped_matrix (
         *(lptr++) = rptr;
         rptr += *n * sizeof(datum_size);
     }
+    // std::cout << "allocation completed" << std::endl;
     
 
     /* process 'world_size - 1' will read submatrix and send them to other processes */
@@ -68,16 +74,24 @@ void read_row_striped_matrix (
     {
         for(int rank = 0; rank < world_size - 1; rank++)
         {
-            fread(*storage, datum_size, BLOCK_SIZE(rank, world_size+1, *m) * *n, infileptr);
-            MPI_Send(*storage, BLOCK_SIZE(rank, world_size, *m) * *n, dtype, rank, DATA_MSG, comm);
+            int row_numbers = BLOCK_SIZE(rank, world_size, *m);
+            if (rank == 0) row_numbers += 1;
+            else row_numbers += 2;
+            fread(*storage, datum_size, row_numbers * *n, infileptr);
+            fseek(infileptr, -(datum_size * 2 * *n), SEEK_CUR);
+            MPI_Send(*storage, row_numbers * *n, dtype, rank, DATA_MSG, comm);
+            std::cout << "rank(p-1) send to rank" << rank << " " << row_numbers << " rows" << std::endl;
         }
+        // std::cout << "rank[" << world_rank << "]: local_rows = " << local_rows << std::endl;
         fread(*storage, datum_size, local_rows * *n, infileptr);
     }
     else
     {
+
         MPI_Recv(*storage, local_rows * *n, dtype, world_size-1, DATA_MSG, comm, MPI_STATUS_IGNORE);
+        std::cout << "rank" << world_rank << " received msg successfully." << std::endl;
     }
-    
+    std::cout << "done" << std::endl;
 }
 
 void print_matrix(int **a, int m, int n)
