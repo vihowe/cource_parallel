@@ -1,2 +1,5 @@
 *_log
 *.png
+*.gz
+*_out
+.vscode
