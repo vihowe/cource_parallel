@@ -269,6 +269,26 @@ void print_block_vector(void* vec, int n, MPI_Datatype dtype, MPI_Comm comm)
     }
 }
 
+void read_vector(char* filename, void** buffer, int* nv, MPI_Datatype dtype)
+{
+    FILE* infileptr = fopen(filename, "r");
+    fread(nv, sizeof(int), 1, infileptr);
+
+    int datum_size = get_size(dtype);
+
+    *buffer = malloc(datum_size * *nv);
+    fread(*buffer, datum_size * *nv, *nv, infileptr);
+}
+void read_matrix(char* filename, void*** matrix, void** storage, int* m, int* n, MPI_Datatype dtype)
+{
+    FILE* infileptr = fopen(filename, "r");
+    fread(m, sizeof(int), 1, infileptr);
+    fread(n, sizeof(int), 1, infileptr);
+    int datum_size = get_size(dtype);
+    *storage = malloc(datum_size * *m * *n);
+    fread(*storage, datum_size, *m * *n, infileptr);
+
+}
 
 // int main(int argc, char ** argv)
 // {

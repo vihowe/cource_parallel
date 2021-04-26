@@ -25,3 +25,8 @@ void terminat(int id, char* error_msg);
 void create_uniform_xfer_arrays(int world_rank, int world_size, int n, int **recv_count, int **recv_disp);
 
 void print_block_vector(void *vec, int n, MPI_Datatype dtype, MPI_Comm comm);
+
+
+void read_vector(char* filename, void** buffer, int* nv, MPI_Datatype dtype);
+
+void read_matrix(char* filename, void*** matrix, void** storage, int* m, int* n, MPI_Datatype dtype);
