@@ -17,3 +17,11 @@ void read_column_stripped_matrix(char* filename, void ***subs, void **storage, i
 void create_mixed_xfer_arrays(int world_rank, int world_size, int n, int** send_count, int **send_disp);
 void print_column_stripped_matrix(void **a, int m, int n, MPI_Datatype dtype, MPI_Comm comm);
 void print_vect(void *buffer, int n, MPI_Datatype dtype);
+
+void read_replicated_vector(char* filename, void** vec, MPI_Datatype dtype, int *n, MPI_Comm comm);
+
+void terminat(int id, char* error_msg);
+
+void create_uniform_xfer_arrays(int world_rank, int world_size, int n, int **recv_count, int **recv_disp);
+
+void print_block_vector(void *vec, int n, MPI_Datatype dtype, MPI_Comm comm);
